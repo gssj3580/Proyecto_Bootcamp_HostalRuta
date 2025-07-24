@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Habitaciones</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <nav>
+            <ul>
+                <li><a href="{{ url_for('index') }}">Habitaciones</a></li>
+                <li><a href="{{ url_for('add_room') }}">Añadir Habitación</a></li>
+                <li><a href="{{ url_for('analytics') }}">Análisis de Datos</a></li>
+                <li><a href="{{ url_for('recommend_room') }}">Recomendación IA</a></li>
+            </ul>
+        </nav>
+
+        <h1>Gestión de Habitaciones</h1>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <ul class="messages">
+                    {% for category, message in messages %}
+                        <li class="{{ category }}">{{ message }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        {% endwith %}
+
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Número</th>
+                    <th>Tipo</th>
+                    <th>Precio</th>
+                    <th>Disponible</th>
+                    <th>Última Limpieza</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for room in rooms %}
+                <tr>
+                    <td>{{ room.id }}</td>
+                    <td>{{ room.room_number }}</td>
+                    <td>{{ room.room_type }}</td>
+                    <td>${{ "%.2f"|format(room.price) }}</td>
+                    <td>{{ 'Sí' if room.is_available else 'No' }}</td>
+                    <td>{{ room.last_cleaned_date }}</td>
+                    <td class="actions">
+                        <a href="{{ url_for('edit_room', id=room.id) }}" class="button edit">Editar</a>
+                        <form action="{{ url_for('delete_room', id=room.id) }}" method="POST" style="display:inline;">
+                            <button type="submit" class="button delete" onclick="return confirm('¿Estás seguro de que quieres eliminar esta habitación?');">Eliminar</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>

@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recomendación de Habitación IA</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <nav>
+            <ul>
+                <li><a href="{{ url_for('index') }}">Habitaciones</a></li>
+                <li><a href="{{ url_for('add_room') }}">Añadir Habitación</a></li>
+                <li><a href="{{ url_for('analytics') }}">Análisis de Datos</a></li>
+                <li><a href="{{ url_for('recommend_room') }}">Recomendación IA</a></li>
+            </ul>
+        </nav>
+
+        <h1>Recomendación de Habitación</h1>
+        <p>Demostración de IA exploratoria: Obtén una recomendación de habitación basada en tus preferencias.</p>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <ul class="messages">
+                    {% for category, message in messages %}
+                        <li class="{{ category }}">{{ message }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        {% endwith %}
+
+        <form method="POST">
+            <div class="form-group">
+                <label for="preference">Tipo de Habitación Preferida:</label>
+                <select id="preference" name="preference">
+                    <option value="any">Cualquiera</option>
+                    <option value="Standard">Standard</option>
+                    <option value="Deluxe">Deluxe</option>
+                    <option value="Suite">Suite</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="budget">Presupuesto Máximo:</label>
+                <input type="number" id="budget" name="budget" step="0.01" placeholder="Ej: 150.00">
+            </div>
+            <div class="button-group">
+                <button type="submit" class="button">Obtener Recomendación</button>
+            </div>
+        </form>
+
+        {% if recommended_room %}
+            <h2>Habitación Recomendada:</h2>
+            <div class="card">
+                <h3>Número: {{ recommended_room.room_number }}</h3>
+                <p><strong>Tipo:</strong> {{ recommended_room.room_type }}</p>
+                <p><strong>Precio:</strong> ${{ "%.2f"|format(recommended_room.price) }}</p>
+                <p><strong>Estado:</strong> {{ 'Disponible' if recommended_room.is_available else 'Ocupada' }}</p>
+                <p><em>Esta es una recomendación simple basada en disponibilidad, tipo y presupuesto.</em></p>
+            </div>
+        {% elif request.method == 'POST' %}
+            <p>No se encontró ninguna habitación que coincida con tus preferencias.</p>
+        {% endif %}
+    </div>
+</body>
+</html>

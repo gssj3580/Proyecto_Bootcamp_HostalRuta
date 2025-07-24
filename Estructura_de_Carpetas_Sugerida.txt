@@ -1,0 +1,12 @@
+hotel_HostalRuta_app/
+├── app.py                     # Archivo principal de la aplicación Flask
+├── requirements.txt           # Dependencias del proyecto
+├── database_setup.py          # Script para configurar la BD y datos iniciales
+├── static/
+│   └── style.css              # Hoja de estilos CSS
+└── templates/
+    ├── index.html             # Página principal (listado de habitaciones)
+    ├── add_room.html          # Formulario para añadir habitación
+    ├── edit_room.html         # Formulario para editar habitación
+    ├── analytics.html         # Página de análisis de datos
+    └── recommend.html         # Página de recomendación de IA

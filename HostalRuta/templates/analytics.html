@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Análisis de Datos</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="container">
+        <nav>
+            <ul>
+                <li><a href="{{ url_for('index') }}">Habitaciones</a></li>
+                <li><a href="{{ url_for('add_room') }}">Añadir Habitación</a></li>
+                <li><a href="{{ url_for('analytics') }}">Análisis de Datos</a></li>
+                <li><a href="{{ url_for('recommend_room') }}">Recomendación IA</a></li>
+            </ul>
+        </nav>
+
+        <h1>Análisis de Datos de Habitaciones</h1>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <ul class="messages">
+                    {% for category, message in messages %}
+                        <li class="{{ category }}">{{ message }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        {% endwith %}
+
+        <h2>Resumen por Tipo de Habitación</h2>
+        {% if stats %}
+            <table>
+                <thead>
+                    <tr>
+                        <th>Tipo de Habitación</th>
+                        <th>Total de Habitaciones</th>
+                        <th>Habitaciones Disponibles</th>
+                        <th>Habitaciones Ocupadas</th>
+                        <th>Tasa de Ocupación (%)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for stat in stats %}
+                    <tr>
+                        <td>{{ stat.room_type }}</td>
+                        <td>{{ stat.total_rooms }}</td>
+                        <td>{{ stat.available_rooms }}</td>
+                        <td>{{ stat.occupied_rooms }}</td>
+                        <td>{{ "%.2f"|format(stat.occupancy_rate) }}%</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p>No hay datos de habitaciones disponibles para el análisis.</p>
+        {% endif %}
+
+        <h2>Tendencia de Ocupación (Simulada)</h2>
+        <div style="width: 80%; margin: auto;">
+            <canvas id="occupancyChart"></canvas>
+        </div>
+        <p><em>Este gráfico muestra una tendencia de ocupación simulada para demostración.</em></p>
+
+        <script>
+            // Datos del gráfico (simulados desde Python)
+            const historicalOccupancyData = {{ historical_occupancy | tojson }};
+            const labels = Object.keys(historicalOccupancyData);
+            const data = Object.values(historicalOccupancyData).map(value => (value * 100).toFixed(2)); // Convertir a porcentaje
+
+            const ctx = document.getElementById('occupancyChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Tasa de Ocupación (%)',
+                        data: data,
+                        borderColor: 'rgb(75, 192, 192)',
+                        tension: 0.1,
+                        fill: false
+                    }]
+                },
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100,
+                            title: {
+                                display: true,
+                                text: 'Tasa de Ocupación (%)'
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Fecha'
+                            }
+                        }
+                    },
+                    responsive: true,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Ocupación Diaria (Últimos 7 Días)'
+                        }
+                    }
+                }
+            });
+        </script>
+    </div>
+</body>
+</html>
